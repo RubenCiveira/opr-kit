@@ -1,4 +1,4 @@
-# @warhost/opr-kit
+# @rubenciveira/opr-kit
 
 Logica de ejercitos de [One Page Rules](https://www.onepagerules.com/) sin
 depender de ningun backend: constructor de listas, desglose de mejoras, reglas
@@ -12,7 +12,7 @@ Appwrite, pero no sabe nada de Appwrite: cada aplicacion trae sus datos.
 ## Instalar
 
 ```bash
-pnpm add @warhost/opr-kit
+pnpm add @rubenciveira/opr-kit
 ```
 
 Solo ESM, con tipos incluidos.
@@ -22,9 +22,9 @@ Solo ESM, con tipos incluidos.
 Cada modulo se importa por separado:
 
 ```ts
-import { sectionsForUnit, buildArmy } from "@warhost/opr-kit/core/builder";
-import { reglasUsadasEnEjercito } from "@warhost/opr-kit/core/faccion";
-import { parseSpells } from "@warhost/opr-kit/core/spells";
+import { sectionsForUnit, buildArmy } from "@rubenciveira/opr-kit/core/builder";
+import { reglasUsadasEnEjercito } from "@rubenciveira/opr-kit/core/faccion";
+import { parseSpells } from "@rubenciveira/opr-kit/core/spells";
 ```
 
 | Modulo | Para que |

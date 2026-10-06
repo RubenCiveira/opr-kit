@@ -1,5 +1,5 @@
 {
-  "name": "@warhost/opr-kit",
+  "name": "@rubenciveira/opr-kit",
   "version": "0.1.0",
   "description": "Logica de ejercitos de One Page Rules (constructor, reglas, importacion de Army Forge), independiente del backend.",
   "keywords": ["one-page-rules", "opr", "army-forge", "wargames", "grimdark-future", "age-of-fantasy"],

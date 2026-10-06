@@ -1,6 +1,6 @@
 import { defineConfig } from "tsup";
 
-// Un fichero por modulo de core, para que `@warhost/opr-kit/core/<modulo>`
+// Un fichero por modulo de core, para que `@rubenciveira/opr-kit/core/<modulo>`
 // apunte a algo real; lo que comparten va a trozos aparte en vez de duplicarse.
 export default defineConfig({
   entry: ["src/core/*.ts"],
