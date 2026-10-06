@@ -1,10 +1,33 @@
 {
   "name": "@warhost/opr-kit",
-  "private": true,
-  "version": "0.0.0",
-  "description": "Logica y vistas de ejercitos de One Page Rules, independientes del backend.",
+  "version": "0.1.0",
+  "description": "Logica de ejercitos de One Page Rules (constructor, reglas, importacion de Army Forge), independiente del backend.",
+  "keywords": ["one-page-rules", "opr", "army-forge", "wargames", "grimdark-future", "age-of-fantasy"],
+  "license": "MIT",
+  "author": "Ruben Civeira",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RubenCiveira/opr-kit.git"
+  },
   "type": "module",
+  "sideEffects": false,
+  "files": ["dist"],
   "exports": {
-    "./core/*": "./src/core/*.ts"
+    "./core/*": {
+      "types": "./dist/core/*.d.ts",
+      "import": "./dist/core/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p .",
+    "prepublishOnly": "pnpm typecheck && pnpm build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   }
 }
