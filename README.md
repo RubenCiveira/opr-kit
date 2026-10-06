@@ -1,8 +1,9 @@
 # @rubenciveira/opr-kit
 
-Logica de ejercitos de [One Page Rules](https://www.onepagerules.com/) sin
-depender de ningun backend: constructor de listas, desglose de mejoras, reglas
-y auras, composicion, hechizos e importacion de listas de Army Forge.
+Logica y vistas de ejercitos de [One Page Rules](https://www.onepagerules.com/)
+sin depender de ningun backend: constructor de listas, desglose de mejoras,
+reglas y auras, composicion, hechizos, importacion de listas de Army Forge y
+cartas e impresion en React.
 
 Nace de [Warhost](https://github.com/RubenCiveira/warhost), que la usa sobre
 Appwrite, pero no sabe nada de Appwrite: cada aplicacion trae sus datos.
@@ -42,6 +43,26 @@ import { parseSpells } from "@rubenciveira/opr-kit/core/spells";
 | `questHero`, `questShop` | Heroes y tienda de Star Quest / Fantasy Quest |
 | `model` | Tipos de entrada |
 
+## Vistas en React
+
+`react` (18 o 19) es `peerDependency`: usa la de tu aplicacion.
+
+```tsx
+import UnitCard from "@rubenciveira/opr-kit/react/UnitCard";
+import ArmyPrintView from "@rubenciveira/opr-kit/react/ArmyPrintView";
+```
+
+| Componente | Que dibuja |
+|---|---|
+| `UnitCard` | Carta de unidad de 120 x 70 mm (o de personaje, 120 x 140) |
+| `RuleCard`, `SpellCard`, `HeroSkillCard` | Cartas Mini Euro de 44 x 68 mm |
+| `ArmyPrintView` | Impresion de un ejercito: modo libro o tarjetas con dorso |
+| `FactionPrintView` | Impresion de una faccion entera como libro |
+| `LoreText`, `TextoConReferencias`, `IconoArma` | Piezas que usan las anteriores |
+
+Las imagenes llegan ya resueltas, como URL o como funcion (`avatarDe`,
+`miniaturaDe`, `coverUrl`): el paquete no sabe donde se guardan.
+
 ## Tus datos
 
 Los tipos de `core/model` solo declaran los campos que la logica lee. Cualquier
@@ -66,7 +87,10 @@ cd ../mi-app
 pnpm link ../opr-kit
 ```
 
-`pnpm build --watch` recompila al guardar.
+`pnpm build --watch` recompila al guardar. Con el paquete enlazado, el bundler
+puede acabar con dos copias de React —la de la app y la de desarrollo del
+paquete— y los hooks fallan; en Vite se evita con
+`resolve: { dedupe: ["react", "react-dom"] }`.
 
 ## Licencia
 

@@ -6,15 +6,34 @@
  * cualquier fila que lo lleve encaje sin copiarla.
  */
 export interface ArmyBook {
+  /** Lo que guarda `bookKey` en las unidades para saber de que libro son. */
+  id: string;
+  name: string;
+  factionName: string | null;
+  /** Hechizos del libro, serializados en JSON (ver `parseSpells`). */
+  spells: string | null;
+  lore: string | null;
   /** Reglas que publica este libro; el glosario es comun y no lo dice. */
   ruleNames: string[];
 }
 
+/** Una unidad del catalogo de un libro, antes de configurarla. */
 export interface ArmyUnit {
+  bookKey: string;
+  /** Solo es unico dentro de su libro. */
+  unitId: string;
   name: string;
+  size: number;
+  quality: number;
+  defense: number;
+  cost: number;
   rules: string[];
+  /** Armas y equipo de serie, serializados en JSON (ver `baseLoadout`). */
   weapons: string | null;
   items: string | null;
+  upgradePackageUids: string[];
+  sortOrder: number;
+  lore: string | null;
 }
 
 export interface CatalogRule {
