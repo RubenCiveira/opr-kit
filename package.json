@@ -1,6 +1,6 @@
 {
   "name": "@rubenciveira/opr-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Logica y vistas de ejercitos de One Page Rules (constructor, reglas, cartas, impresion e importacion de Army Forge), independientes del backend.",
   "keywords": [
     "one-page-rules",
@@ -17,11 +17,14 @@
     "url": "git+https://github.com/RubenCiveira/opr-kit.git"
   },
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "files": [
     "dist"
   ],
   "exports": {
+    "./styles.css": "./dist/styles.css",
     "./core/*": {
       "types": "./dist/core/*.d.ts",
       "import": "./dist/core/*.js"
@@ -32,7 +35,7 @@
     }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp src/styles.css dist/styles.css",
     "typecheck": "tsc -p .",
     "prepublishOnly": "pnpm typecheck && pnpm build"
   },

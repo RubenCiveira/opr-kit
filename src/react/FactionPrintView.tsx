@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useState } from "react";
 import type { ArmyBook, ArmyUnit, CatalogRule } from "../core/model";
 import { sectionsForUnit } from "../core/builder";
@@ -12,6 +14,7 @@ import LoreText from "./LoreText";
 import SpellCard from "./SpellCard";
 import RuleCard from "./RuleCard";
 import { parseHabilidad } from "../core/reglas";
+import { useTextos } from "./textos";
 
 function unidadResuelta(unit: ArmyUnit): ResolvedUnit {
   return {
@@ -49,6 +52,7 @@ export default function FactionPrintView({
   glosario: Map<string, CatalogRule>;
   onCerrar: () => void;
 }) {
+  const t = useTextos();
   const unidadesOrdenadas = useMemo(() => agruparUnidades(units).flatMap((grupo) => grupo.unidades), [units]);
   const hechizos = useMemo(() => parseSpells(book.spells ?? null), [book.spells]);
   const imprimeHechizos = useMemo(
@@ -66,22 +70,22 @@ export default function FactionPrintView({
     <div className="print-vista print-faccion">
       <div className="print-toolbar">
         <button type="button" onClick={onCerrar}>
-          Cancelar
+          {t.cancelar}
         </button>
-        <h2 className="print-toolbar-title">Imprimir {book.name}</h2>
+        <h2 className="print-toolbar-title">{t.imprimirTitulo(book.name)}</h2>
         <button type="button" className="primary" onClick={() => window.print()}>
-          Imprimir
+          {t.imprimir}
         </button>
       </div>
       <div className="print-lore-opciones">
         <label className="row" style={{ cursor: "pointer" }}>
           <input type="checkbox" checked={portada} onChange={(e) => setPortada(e.target.checked)} style={{ width: "auto" }} />
-          <span>Portada con nombre e imagen</span>
+          <span>{t.portadaConImagen}</span>
         </label>
         {book.lore ? (
           <label className="row" style={{ cursor: "pointer" }}>
             <input type="checkbox" checked={incluirLore} onChange={(e) => setIncluirLore(e.target.checked)} style={{ width: "auto" }} />
-            <span>Incluir el trasfondo de la faccion</span>
+            <span>{t.incluirTrasfondo}</span>
           </label>
         ) : null}
       </div>
@@ -115,7 +119,7 @@ export default function FactionPrintView({
         })}
         {imprimeHechizos ? (
           <section className="print-faccion-extra">
-            <h2>Hechizos</h2>
+            <h2>{t.hechizos}</h2>
             <div className="print-card-grid">
               {hechizos.map((spell) => (
                 <SpellCard key={spell.key} spell={spell} faction={book.factionName ?? book.name} glosario={glosario} />

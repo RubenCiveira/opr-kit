@@ -1,8 +1,11 @@
+"use client";
+
 import type { CatalogRule } from "../core/model";
 import { conValor, parseHabilidad } from "../core/reglas";
 import type { Habilidad } from "../core/reglas";
 import { densidadScard } from "./cardDensity";
 import TextoConReferencias from "./TextoConReferencias";
+import { useTextos } from "./textos";
 
 /**
  * Habilidad o equipo en carta Mini Euro vertical, la misma que el hechizo.
@@ -25,11 +28,12 @@ export default function RuleCard({
   glosario?: Map<string, CatalogRule>;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   const texto = regla ? conValor(regla.description, habilidad.valor) : null;
   const concede = habilidad.concede?.length ? habilidad.concede.map((nombre) => parseHabilidad(nombre, "regla")) : null;
   const listaConcede = concede ? (
     <>
-      Concede{" "}
+      {t.concede}{" "}
       {concede.map((una, indice) => (
         <span key={una.nombre}>
           {indice > 0 ? ", " : ""}
@@ -47,12 +51,12 @@ export default function RuleCard({
 
   return (
     <div className="scard-frame">
-      <article className={`scard${densidadScard(texto, habilidad.concede?.length ? `Concede ${habilidad.concede.join(", ")}` : null)}`}>
+      <article className={`scard${densidadScard(texto, habilidad.concede?.length ? `${t.concede} ${habilidad.concede.join(", ")}` : null)}`}>
         <header className="scard-head">
           <h3 className="scard-title">{habilidad.nombre}</h3>
           {habilidad.valor ? (
             <div className="scard-valor">
-              <span className="scard-valor-key">Valor</span>
+              <span className="scard-valor-key">{t.valor}</span>
               <span className="scard-valor-num">{habilidad.valor}</span>
             </div>
           ) : null}
@@ -71,19 +75,14 @@ export default function RuleCard({
               <p className="scard-efecto">{listaConcede}.</p>
             </div>
           ) : (
-            <p className="scard-efecto scard-sin-texto">
-              No hay texto para esta regla, ni en los libros de faccion ni en el reglamento basico.
-            </p>
+            <p className="scard-efecto scard-sin-texto">{t.sinTexto}</p>
           )}
         </div>
 
         <footer className="scard-foot">
-          <span className="scard-faccion">{habilidad.tipo === "equipo" ? "Equipo" : "Regla especial"}</span>
+          <span className="scard-faccion">{habilidad.tipo === "equipo" ? t.equipo : t.reglaEspecial}</span>
           {lleva?.length ? (
-            <span className="scard-tirada">
-              Lo llevan {lleva.slice(0, 3).join(", ")}
-              {lleva.length > 3 ? ` y ${lleva.length - 3} mas` : ""}
-            </span>
+            <span className="scard-tirada">{t.loLlevan(lleva)}</span>
           ) : null}
         </footer>
       </article>

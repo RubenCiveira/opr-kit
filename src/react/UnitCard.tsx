@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { normalizeLoadout } from "../core/loadout";
 import type { LoadoutEntry } from "../core/loadout";
@@ -10,6 +12,8 @@ import { reglaDelAura, reglaParaLaUnidad } from "../core/auras";
 import type { Habilidad } from "../core/reglas";
 import type { HeroSkillCardData } from "./HeroSkillCard";
 import LoreText from "./LoreText";
+import { useTextos } from "./textos";
+import type { Textos } from "./textos";
 
 /**
  * Lo que la carta necesita del glosario: quien tiene descripcion, y cual es,
@@ -183,10 +187,10 @@ interface Props {
  * detras salia "Replace all Adrenaline Fueleds todos". Solo se anota lo que la
  * etiqueta no cuenta: cuantas opciones distintas caben.
  */
-function limitLabel(section: UpgradeSection): string {
+function limitLabel(section: UpgradeSection, t: Textos): string {
   const distinct = maxDistinctOptions(section);
   if (distinct === Number.POSITIVE_INFINITY) return "";
-  return `elige ${distinct === 1 ? "una" : distinct}`;
+  return t.elige(distinct);
 }
 
 /** Una habilidad o un equipo, pulsable para abrir su carta. */
@@ -201,6 +205,7 @@ function Chip({
   glosario?: GlosarioCarta;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   // Sin glosario cargado no se sabe cuales tienen texto: se dejan todas
   // pulsables antes que marcarlas en falso. Un conjunto vacio es justo eso —
   // todavia cargando, o no llego—, no "ninguna tiene descripcion".
@@ -226,7 +231,7 @@ function Chip({
       type="button"
       className={clases}
       disabled={!onAbrir}
-      title={tieneTexto ? `Ver ${habilidad.nombre}` : `${habilidad.nombre}: regla del reglamento basico`}
+      title={tieneTexto ? t.ver(habilidad.nombre) : t.reglaBasica(habilidad.nombre)}
       onClick={() => onAbrir?.(habilidad)}
     >
       {cuantos > 1 ? <span className="ucard-count">{cuantos}×</span> : null}
@@ -243,7 +248,7 @@ function Chip({
         type="button"
         className="ucard-chip ucard-chip-concede"
         disabled={!onAbrir}
-        title={`Concede ${aura.concede.etiqueta}${aura.alcance ? ` ${aura.alcance}` : ""}: ver la regla`}
+        title={t.concedeVer(`${aura.concede.etiqueta}${aura.alcance ? ` ${aura.alcance}` : ""}`)}
         onClick={() => onAbrir?.(aura.concede)}
       >
         {aura.concede.nombre}
@@ -479,6 +484,7 @@ function FilaArma({
   glosario?: GlosarioCarta;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   return (
     <tr>
       <td>
@@ -490,7 +496,7 @@ function FilaArma({
           </span>
         </span>
       </td>
-      <td className="num">{weapon.range === null ? "CaC" : `${weapon.range}"`}</td>
+      <td className="num">{weapon.range === null ? t.cuerpoACuerpo : `${weapon.range}"`}</td>
       <td className="num">{weapon.attacks === null ? "—" : `A${weapon.attacks}`}</td>
       <td className="ucard-wrules">
         {weapon.rules.length > 0 ? (
@@ -517,7 +523,8 @@ function ClusterReglas({
   glosario?: GlosarioCarta;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
-  if (rules.length === 0) return <p className="ucard-vacio">Ninguna</p>;
+  const t = useTextos();
+  if (rules.length === 0) return <p className="ucard-vacio">{t.ninguna}</p>;
   return (
     <div className="ucard-chips">
       {rules.map((rule) => (
@@ -544,13 +551,14 @@ function ChipAporte({
   alcance: string | null;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   return (
     <span className="ucard-chip-doble">
       <button
         type="button"
         className="ucard-chip"
         disabled={!onAbrir}
-        title={`Ver ${nombre}`}
+        title={t.ver(nombre)}
         onClick={() => onAbrir?.(parseHabilidad(nombre, "regla"))}
       >
         {nombre}
@@ -559,7 +567,7 @@ function ChipAporte({
         type="button"
         className="ucard-chip ucard-chip-concede"
         disabled={!onAbrir}
-        title={`Concede ${concede.etiqueta}${alcance ? ` ${alcance}` : ""}: ver la regla`}
+        title={t.concedeVer(`${concede.etiqueta}${alcance ? ` ${alcance}` : ""}`)}
         onClick={() => onAbrir?.(concede)}
       >
         {concede.nombre}
@@ -582,6 +590,7 @@ function TablaArmas({
   glosario?: GlosarioCarta;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   if (weapons.length === 0) return null;
   const visibles = weapons.slice(0, max);
   const ocultas = weapons.length - visibles.length;
@@ -590,10 +599,10 @@ function TablaArmas({
       <table className="ucard-table">
         <thead>
           <tr>
-            <th>Arma</th>
-            <th className="num">Alc.</th>
-            <th className="num">Atq.</th>
-            <th>Reglas de arma</th>
+            <th>{t.arma}</th>
+            <th className="num">{t.alcance}</th>
+            <th className="num">{t.ataques}</th>
+            <th>{t.reglasDeArma}</th>
           </tr>
         </thead>
         <tbody>
@@ -604,7 +613,7 @@ function TablaArmas({
       </table>
       {ocultas > 0 ? (
         <p className="ucard-mas">
-          y {ocultas} arma{ocultas === 1 ? "" : "s"} mas, en el detalle de la unidad
+          {t.armasOcultas(ocultas)}
         </p>
       ) : null}
     </div>
@@ -621,14 +630,15 @@ function TablaEquipo({
   glosario?: GlosarioCarta;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   if (gear.length === 0) return null;
   return (
     <section className="ucard-bloque">
       <table className="ucard-table ucard-equipo-tabla">
         <thead>
           <tr>
-            <th>Equipo</th>
-            <th>Concede</th>
+            <th>{t.equipo}</th>
+            <th>{t.concede}</th>
           </tr>
         </thead>
         <tbody>
@@ -682,6 +692,7 @@ function ColumnaPerfil({
   glosario?: GlosarioCarta;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   const loadout = normalizeLoadout(perfil.loadout);
   const weapons = loadout.filter((entry) => entry.kind === "weapon");
   const gear = loadout.filter((entry) => entry.kind === "gear");
@@ -693,14 +704,14 @@ function ColumnaPerfil({
       <div className="ucard-columna-cab">
         <span className="ucard-columna-nombre">{nombre}</span>
         <span className="ucard-columna-mini">
-          <span>Cal {perfil.quality}+</span>
-          <span>Def {perfil.defense}+</span>
-          {perfil.maxWounds !== undefined ? <span>Her {perfil.maxWounds}</span> : null}
+          <span>{t.calidad} {perfil.quality}+</span>
+          <span>{t.defensa} {perfil.defense}+</span>
+          {perfil.maxWounds !== undefined ? <span>{t.heridas} {perfil.maxWounds}</span> : null}
         </span>
       </div>
       <TablaArmas weapons={weapons} max={ARMAS_VISIBLES_COLUMNA} glosario={glosario} onAbrir={onAbrir} />
       <section className="ucard-bloque">
-        <h4 className="ucard-bloque-title">Reglas</h4>
+        <h4 className="ucard-bloque-title">{t.reglas}</h4>
         <ClusterReglas rules={perfil.rules} glosario={glosario} onAbrir={onAbrir} />
       </section>
       <TablaEquipo gear={gear} glosario={glosario} onAbrir={onAbrir} />
@@ -709,11 +720,11 @@ function ColumnaPerfil({
           o se la de un objeto como "Preacher". */}
       {liderazgo || aportesHeroe.length > 0 ? (
         <section className="ucard-bloque ucard-mando">
-          <h4 className="ucard-bloque-title">El mando aporta</h4>
+          <h4 className="ucard-bloque-title">{t.elMandoAporta}</h4>
           <div className="ucard-chips">
             {liderazgo ? (
               <span className="ucard-chip ucard-chip-liderazgo">
-                Liderazgo <b>{liderazgo}</b>
+                {t.liderazgo} <b>{liderazgo}</b>
               </span>
             ) : null}
             {aportesHeroe.map((aporte) => (
@@ -759,6 +770,7 @@ export default function UnitCard({
   questClassSkills = [],
   onQuestClassSkill,
 }: Props) {
+  const t = useTextos();
   const hoja = formato === "hoja";
   const personaje = formato === "personaje";
   // La union heroe + unidad solo tiene sentido en la carta de mesa de un
@@ -808,34 +820,34 @@ export default function UnitCard({
   // titulo lleva su perfil de personaje completo.
   const stats: Array<[string, string]> = quest
     ? [
-        ["Cal", `${unit.quality}+`],
-        ["Def", `${unit.defense}+`],
-        ...(unit.maxWounds !== undefined ? ([["Agu", String(unit.maxWounds)]] as Array<[string, string]>) : []),
-        ...(unit.power !== undefined ? ([["Pow", String(unit.power)]] as Array<[string, string]>) : []),
-        ...(unit.strength !== undefined ? ([["Str", `${unit.strength}+`]] as Array<[string, string]>) : []),
-        ...(unit.dexterity !== undefined ? ([["Dex", `${unit.dexterity}+`]] as Array<[string, string]>) : []),
-        ...(unit.willpower !== undefined ? ([["Will", `${unit.willpower}+`]] as Array<[string, string]>) : []),
+        [t.calidad, `${unit.quality}+`],
+        [t.defensa, `${unit.defense}+`],
+        ...(unit.maxWounds !== undefined ? ([[t.aguante, String(unit.maxWounds)]] as Array<[string, string]>) : []),
+        ...(unit.power !== undefined ? ([[t.poder, String(unit.power)]] as Array<[string, string]>) : []),
+        ...(unit.strength !== undefined ? ([[t.fuerza, `${unit.strength}+`]] as Array<[string, string]>) : []),
+        ...(unit.dexterity !== undefined ? ([[t.destreza, `${unit.dexterity}+`]] as Array<[string, string]>) : []),
+        ...(unit.willpower !== undefined ? ([[t.voluntad, `${unit.willpower}+`]] as Array<[string, string]>) : []),
       ]
     : emparejada && adjunta
       ? [
-          ["Min", String(unit.size + adjunta.size)],
+          [t.miniaturas, String(unit.size + adjunta.size)],
           ...(unit.cost !== undefined || adjunta.cost !== undefined
-            ? ([["Pts", String((unit.cost ?? 0) + (adjunta.cost ?? 0))]] as Array<[string, string]>)
+            ? ([[t.puntos, String((unit.cost ?? 0) + (adjunta.cost ?? 0))]] as Array<[string, string]>)
             : []),
         ]
       : [
-          ["Min", String(unit.size)],
-          ["Cal", `${unit.quality}+`],
-          ["Def", `${unit.defense}+`],
-          ...(unit.maxWounds !== undefined ? ([["Her", String(unit.maxWounds)]] as Array<[string, string]>) : []),
-          ...(unit.cost !== undefined ? ([["Pts", String(unit.cost)]] as Array<[string, string]>) : []),
+          [t.miniaturas, String(unit.size)],
+          [t.calidad, `${unit.quality}+`],
+          [t.defensa, `${unit.defense}+`],
+          ...(unit.maxWounds !== undefined ? ([[t.heridas, String(unit.maxWounds)]] as Array<[string, string]>) : []),
+          ...(unit.cost !== undefined ? ([[t.puntos, String(unit.cost)]] as Array<[string, string]>) : []),
         ];
 
   const campanaQuest: Array<[string, string]> = quest
     ? [
-        ...(unit.level !== undefined ? ([["Nivel", String(unit.level)]] as Array<[string, string]>) : []),
-        ...(unit.experience !== undefined ? ([["Experiencia", String(unit.experience)]] as Array<[string, string]>) : []),
-        ...(unit.gold !== undefined ? ([["Monedas", String(unit.gold)]] as Array<[string, string]>) : []),
+        ...(unit.level !== undefined ? ([[t.nivel, String(unit.level)]] as Array<[string, string]>) : []),
+        ...(unit.experience !== undefined ? ([[t.experiencia, String(unit.experience)]] as Array<[string, string]>) : []),
+        ...(unit.gold !== undefined ? ([[t.monedas, String(unit.gold)]] as Array<[string, string]>) : []),
       ]
     : [];
 
@@ -861,7 +873,7 @@ export default function UnitCard({
         <div key={section.id ?? section.uid} className="ucard-section">
           <p className="ucard-section-head">
             {section.label}
-            {limitLabel(section) ? <span className="ucard-limit"> · {limitLabel(section)}</span> : null}
+            {limitLabel(section, t) ? <span className="ucard-limit"> · {limitLabel(section, t)}</span> : null}
           </p>
           <ul className="ucard-option-list">
             {(section.options ?? []).map((option) => (
@@ -871,7 +883,7 @@ export default function UnitCard({
                   optionAction(section, option)
                 ) : (
                   <span className="ucard-price">
-                    {optionCost(option, unitId) === 0 ? "gratis" : `+${optionCost(option, unitId)}`}
+                    {optionCost(option, unitId) === 0 ? t.gratis : `+${optionCost(option, unitId)}`}
                   </span>
                 )}
               </li>
@@ -889,13 +901,13 @@ export default function UnitCard({
   const opciones =
     sections.length === 0 || (variant !== "catalogo" && !optionAction) ? null : hoja ? (
       <div className="ucard-options">
-        <p className="ucard-options-title">Opciones</p>
+        <p className="ucard-options-title">{t.opciones}</p>
         {listaDeSecciones}
       </div>
     ) : (
       <details className="ucard-options" open={optionsOpen}>
         <summary>
-          {optionsLabel ?? "Como configurarla"} <span className="ucard-count">({sections.length} secciones)</span>
+          {optionsLabel ?? t.comoConfigurarla} <span className="ucard-count">{t.secciones(sections.length)}</span>
         </summary>
         {listaDeSecciones}
       </details>
@@ -906,7 +918,7 @@ export default function UnitCard({
   const bloqueCampana =
     campanaQuest.length > 0 ? (
       <section className="ucard-quest-atributos">
-        <h4 className="ucard-bloque-title">Campaña</h4>
+        <h4 className="ucard-bloque-title">{t.campana}</h4>
         <dl className="ucard-campana-list">
           {campanaQuest.map(([label, value]) => (
             <div key={label} className="ucard-campana-fila">
@@ -921,7 +933,7 @@ export default function UnitCard({
   const bloqueHabilidadesQuest =
     questClassSkills.length > 0 ? (
       <section className="ucard-bloque ucard-quest-skills">
-        <h4 className="ucard-bloque-title">Habilidades de clase</h4>
+        <h4 className="ucard-bloque-title">{t.habilidadesDeClase}</h4>
         <div className="ucard-chips">
           {questClassSkills.map((skill) => (
             <button
@@ -929,7 +941,7 @@ export default function UnitCard({
               type="button"
               className="ucard-chip equipo"
               disabled={!onQuestClassSkill}
-              title={`Ver ${skill.name}`}
+              title={t.ver(skill.name)}
               onClick={() => onQuestClassSkill?.(skill)}
             >
               {skill.name}
@@ -978,7 +990,7 @@ export default function UnitCard({
                 {/* El perfil de una combinada ya viene doblado, asi que hay que
                     decirlo o parecera que la unidad es de otro tamaño. */}
                 {combinada || (emparejada && adjunta?.combinada) ? (
-                  <span className="ucard-combinada">Combinada</span>
+                  <span className="ucard-combinada">{t.combinada}</span>
                 ) : null}
               </h3>
             )}
@@ -1021,18 +1033,18 @@ export default function UnitCard({
                     <div className="ucard-personaje-campana">{bloqueCampana}</div>
                     <div className="ucard-personaje-habilidades">
                       <section className="ucard-bloque">
-                        <h4 className="ucard-bloque-title">Reglas</h4>
+                        <h4 className="ucard-bloque-title">{t.reglas}</h4>
                         <ClusterReglas rules={unit.rules} glosario={glosario} onAbrir={onHabilidad} />
                       </section>
                       {bloqueHabilidadesQuest}
                     </div>
                   </div>
                   <div className="ucard-personaje-equipo">
-                    <h4 className="ucard-bloque-title">Equipo adicional</h4>
+                    <h4 className="ucard-bloque-title">{t.equipoAdicional}</h4>
                     {gear.length > 0 ? (
                       <TablaEquipo gear={gear} glosario={glosario} onAbrir={onHabilidad} />
                     ) : (
-                      <p className="ucard-vacio">Sin equipo adicional.</p>
+                      <p className="ucard-vacio">{t.sinEquipoAdicional}</p>
                     )}
                   </div>
                 </div>
@@ -1043,7 +1055,7 @@ export default function UnitCard({
                   {bloqueCampana}
                   <div className="ucard-quest-habilidades">
                     <section className="ucard-bloque">
-                      <h4 className="ucard-bloque-title">Reglas</h4>
+                      <h4 className="ucard-bloque-title">{t.reglas}</h4>
                       <ClusterReglas rules={unit.rules} glosario={glosario} onAbrir={onHabilidad} />
                     </section>
                     {bloqueHabilidadesQuest}
@@ -1055,7 +1067,7 @@ export default function UnitCard({
                   {/* Reglas innatas: a todo el ancho, que es como se recorren. Las
                       que da el equipo van con su objeto, en la tabla de abajo. */}
                   <section className="ucard-bloque">
-                    <h4 className="ucard-bloque-title">Reglas</h4>
+                    <h4 className="ucard-bloque-title">{t.reglas}</h4>
                     <ClusterReglas rules={unit.rules} glosario={glosario} onAbrir={onHabilidad} />
                   </section>
 
@@ -1068,7 +1080,7 @@ export default function UnitCard({
 
               {notas ? (
                 <p className="ucard-notas">
-                  <span className="ucard-label">Notas</span>
+                  <span className="ucard-label">{t.notas}</span>
                   {notas}
                 </p>
               ) : null}
@@ -1085,7 +1097,7 @@ export default function UnitCard({
 
       {variant === "ejercito" && (upgrades.length > 0 || (emparejada && (adjunta?.upgrades?.length ?? 0) > 0)) ? (
         <p className="ucard-upgrades">
-          <span className="ucard-label">Mejoras</span>
+          <span className="ucard-label">{t.mejoras}</span>
           {[
             ...upgrades,
             ...(emparejada && adjunta?.upgrades ? adjunta.upgrades : []),

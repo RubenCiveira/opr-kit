@@ -1,8 +1,11 @@
+"use client";
+
 import type { CatalogRule } from "../core/model";
 import type { Spell } from "../core/spells";
 import type { Habilidad } from "../core/reglas";
 import { densidadScard } from "./cardDensity";
 import TextoConReferencias from "./TextoConReferencias";
+import { useTextos } from "./textos";
 
 /**
  * Hechizo como carta Mini Euro vertical, 44 x 68 mm.
@@ -24,13 +27,14 @@ export default function SpellCard({
   glosario?: Map<string, CatalogRule>;
   onAbrir?: (habilidad: Habilidad) => void;
 }) {
+  const t = useTextos();
   return (
     <div className="scard-frame">
       <article className={`scard${densidadScard(spell.effect)}`}>
         <header className="scard-head">
           <h3 className="scard-title">{spell.name}</h3>
           <div className="scard-valor">
-            <span className="scard-valor-key">Valor</span>
+            <span className="scard-valor-key">{t.valor}</span>
             <span className="scard-valor-num">{spell.threshold}+</span>
           </div>
         </header>
@@ -43,7 +47,7 @@ export default function SpellCard({
 
         <footer className="scard-foot">
           {faction ? <span className="scard-faccion">{faction}</span> : null}
-          <span className="scard-tirada">Tira 1D6: iguala o supera {spell.threshold}</span>
+          <span className="scard-tirada">{t.tirada(spell.threshold)}</span>
         </footer>
       </article>
     </div>

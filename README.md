@@ -63,6 +63,62 @@ import ArmyPrintView from "@rubenciveira/opr-kit/react/ArmyPrintView";
 Las imagenes llegan ya resueltas, como URL o como funcion (`avatarDe`,
 `miniaturaDe`, `coverUrl`): el paquete no sabe donde se guardan.
 
+Los componentes llevan `"use client"`: en Next se pueden importar desde un
+componente de servidor, pero se pintan en el cliente.
+
+### Estilos
+
+```ts
+import "@rubenciveira/opr-kit/styles.css";
+```
+
+Importalo antes que el CSS de tu aplicacion, para que tus reglas ganen en los
+empates. Las clases son propias (`ucard-*`, `scard-*`, `print-*`, `libro-*`) y
+no pisan las de Tailwind; el reset de Tailwind tampoco rompe las cartas.
+
+Hay dos ambientaciones: grimdark por defecto y fantasy con
+`<html data-setting="fantasy">`. Los colores salen de variables `--opr-*` con
+especificidad cero, asi que se cambian desde tu `:root`:
+
+```css
+:root {
+  --opr-accent: #635bff;
+  --opr-surface: #ffffff;
+  --opr-text: #1a1a1a;
+}
+```
+
+| Variable | Para que |
+|---|---|
+| `--opr-accent`, `--opr-accent-2` | Color de acento: valores del perfil, bordes activos |
+| `--opr-surface`, `--opr-text` | Fondo y texto de los paneles de las vistas de impresion |
+| `--opr-border`, `--opr-border-strong` | Bordes |
+| `--opr-muted` | Texto secundario |
+| `--opr-raise` | Sombra de las cartas |
+| `--opr-band-letter`, `--opr-band-transform`, `--opr-band-variant` | Tipografia de las bandas de titulo |
+
+Lo que no pone el paquete: el fondo de la pagina, las tipografias ("Saira
+Condensed" para rotulos e "IBM Plex Sans" para el texto; sin ellas se usa la
+sans-serif del sistema) y el aspecto de los botones de la barra de impresion,
+que llevan la clase `primary` para que los estiles tu.
+
+### Textos
+
+Las cartas salen en espanol. Para otro idioma, envuelvelas en un
+`TextosProvider`; el paquete trae ingles:
+
+```tsx
+import { TextosProvider, en } from "@rubenciveira/opr-kit/react/textos";
+
+<TextosProvider textos={en}>
+  <ArmyPrintView … />
+</TextosProvider>
+```
+
+`textos` admite un objeto parcial: lo que no pases sale en espanol. Lo que viene
+de los datos —nombres de unidades, reglas, hechizos— no se traduce, y el
+sustantivo del ejercito (`noun` de `ArmyPrintView`) lo pasas tu.
+
 ## Tus datos
 
 Los tipos de `core/model` solo declaran los campos que la logica lee. Cualquier

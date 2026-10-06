@@ -1,6 +1,9 @@
+"use client";
+
 import type { CatalogRule } from "../core/model";
 import { resaltarMenciones } from "../core/reglas";
 import type { Habilidad } from "../core/reglas";
+import { useTextos } from "./textos";
 
 /**
  * El texto libre de una carta (regla, hechizo o equipo), con las menciones a
@@ -23,6 +26,7 @@ export default function TextoConReferencias({
   onAbrir?: (habilidad: Habilidad) => void;
   propio?: string;
 }) {
+  const t = useTextos();
   if (!texto) return null;
   if (!glosario || glosario.size === 0 || !onAbrir) return <>{texto}</>;
 
@@ -36,7 +40,7 @@ export default function TextoConReferencias({
             key={indice}
             type="button"
             className="regla-mencion"
-            title={`Ver ${parte.nombre}`}
+            title={t.ver(parte.nombre)}
             onClick={() => onAbrir(parte)}
           >
             {parte.etiqueta}

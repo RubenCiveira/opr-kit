@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useState } from "react";
 import type { ArmyBook, CatalogRule } from "../core/model";
 import type { ResolvedUnit } from "../core/armyForgeResolve";
@@ -18,6 +20,8 @@ import RuleCard from "./RuleCard";
 import SpellCard from "./SpellCard";
 import UnitCard from "./UnitCard";
 import LoreText from "./LoreText";
+import { useTextos } from "./textos";
+import type { Textos } from "./textos";
 
 /** Los mismos mm que fijan `--ucard-w/h` y `--scard-w/h` en styles.css: hay
  *  que mantenerlos iguales para que la cuadricula calculada aqui coincida con
@@ -155,32 +159,33 @@ function altoLibroEstimadoMm(unit: ResolvedUnit, glosario: Map<string, CatalogRu
 }
 
 function LibroCabecera({ unit, parte, avatarUrl }: { unit: ResolvedUnit; parte?: string; avatarUrl?: string | null }) {
+  const t = useTextos();
   return (
     <header className="ucard-head libro-cab">
       <h3 className="ucard-title libro-nombre">
         {unit.name}
         {unit.size > 1 ? ` (${unit.size})` : ""}
-        {unit.combined ? <span className="ucard-combinada">Combinada</span> : null}
+        {unit.combined ? <span className="ucard-combinada">{t.combinada}</span> : null}
         {parte ? <span className="libro-parte">{parte}</span> : null}
       </h3>
       {avatarUrl ? <img className="ucard-avatar libro-avatar" src={avatarUrl} alt="" loading="lazy" /> : null}
       <div className="ucard-stats libro-stats">
         <div className="ucard-stat">
-          <span className="ucard-stat-key">Cal</span>
+          <span className="ucard-stat-key">{t.calidad}</span>
           <span className="ucard-stat-value">{unit.quality}+</span>
         </div>
         <div className="ucard-stat">
-          <span className="ucard-stat-key">Def</span>
+          <span className="ucard-stat-key">{t.defensa}</span>
           <span className="ucard-stat-value">{unit.defense}+</span>
         </div>
         {unit.maxWounds !== undefined ? (
           <div className="ucard-stat">
-            <span className="ucard-stat-key">Her</span>
+            <span className="ucard-stat-key">{t.heridas}</span>
             <span className="ucard-stat-value">{unit.maxWounds}</span>
           </div>
         ) : null}
         <div className="ucard-stat">
-          <span className="ucard-stat-key">Pts</span>
+          <span className="ucard-stat-key">{t.puntos}</span>
           <span className="ucard-stat-value">{unit.cost}</span>
         </div>
       </div>
@@ -189,17 +194,18 @@ function LibroCabecera({ unit, parte, avatarUrl }: { unit: ResolvedUnit; parte?:
 }
 
 function TablaArmasLibro({ armas, glosario }: { armas: ResolvedUnit["loadout"]; glosario: Map<string, CatalogRule> }) {
+  const t = useTextos();
   if (armas.length === 0) return null;
   return (
     <section className="ucard-bloque libro-bloque">
-      <h4 className="ucard-bloque-title">Armas</h4>
+      <h4 className="ucard-bloque-title">{t.armas}</h4>
       <table className="ucard-table libro-tabla">
         <thead>
           <tr>
-            <th className="libro-col-nombre">Arma</th>
-            <th>Alc.</th>
-            <th>Atq.</th>
-            <th className="libro-col-reglas">Reglas</th>
+            <th className="libro-col-nombre">{t.arma}</th>
+            <th>{t.alcance}</th>
+            <th>{t.ataques}</th>
+            <th className="libro-col-reglas">{t.reglas}</th>
           </tr>
         </thead>
         <tbody>
@@ -209,7 +215,7 @@ function TablaArmasLibro({ armas, glosario }: { armas: ResolvedUnit["loadout"]; 
                 {arma.count > 1 ? `${arma.count}× ` : ""}
                 {arma.name}
               </td>
-              <td className="num">{arma.range ? `${arma.range}\"` : "CaC"}</td>
+              <td className="num">{arma.range ? `${arma.range}\"` : t.cuerpoACuerpo}</td>
               <td className="num">A{arma.attacks}</td>
               <td className="libro-col-reglas">
                 <ReglasTexto etiquetas={arma.rules} glosario={glosario} />
@@ -223,15 +229,16 @@ function TablaArmasLibro({ armas, glosario }: { armas: ResolvedUnit["loadout"]; 
 }
 
 function TablaReglasLibro({ reglas, glosario }: { reglas: string[]; glosario: Map<string, CatalogRule> }) {
+  const t = useTextos();
   if (reglas.length === 0) return null;
   return (
     <section className="ucard-bloque libro-bloque">
-      <h4 className="ucard-bloque-title">Reglas</h4>
+      <h4 className="ucard-bloque-title">{t.reglas}</h4>
       <table className="ucard-table libro-tabla">
         <thead>
           <tr>
-            <th className="libro-col-nombre">Regla</th>
-            <th className="libro-col-reglas">Texto</th>
+            <th className="libro-col-nombre">{t.regla}</th>
+            <th className="libro-col-reglas">{t.texto}</th>
           </tr>
         </thead>
         <tbody>
@@ -251,15 +258,16 @@ function TablaReglasLibro({ reglas, glosario }: { reglas: string[]; glosario: Ma
 }
 
 function TablaEquipoLibro({ equipo, glosario }: { equipo: ResolvedUnit["loadout"]; glosario: Map<string, CatalogRule> }) {
+  const t = useTextos();
   if (equipo.length === 0) return null;
   return (
     <section className="ucard-bloque libro-bloque">
-      <h4 className="ucard-bloque-title">Equipo</h4>
+      <h4 className="ucard-bloque-title">{t.equipo}</h4>
       <table className="ucard-table libro-tabla">
         <thead>
           <tr>
-            <th className="libro-col-nombre">Equipo</th>
-            <th className="libro-col-reglas">Concede</th>
+            <th className="libro-col-nombre">{t.equipo}</th>
+            <th className="libro-col-reglas">{t.concede}</th>
           </tr>
         </thead>
         <tbody>
@@ -278,16 +286,17 @@ function TablaEquipoLibro({ equipo, glosario }: { equipo: ResolvedUnit["loadout"
 }
 
 function TablaHechizosLibro({ hechizos }: { hechizos: Spell[] }) {
+  const t = useTextos();
   if (hechizos.length === 0) return null;
   return (
     <section className="ucard-bloque libro-bloque">
-      <h4 className="ucard-bloque-title">Hechizos</h4>
+      <h4 className="ucard-bloque-title">{t.hechizos}</h4>
       <table className="ucard-table libro-tabla">
         <thead>
           <tr>
-            <th className="libro-col-nombre">Hechizo</th>
-            <th>Valor</th>
-            <th className="libro-col-reglas">Efecto</th>
+            <th className="libro-col-nombre">{t.hechizo}</th>
+            <th>{t.valor}</th>
+            <th className="libro-col-reglas">{t.efecto}</th>
           </tr>
         </thead>
         <tbody>
@@ -328,22 +337,23 @@ function TablaOpcionesLibro({
   unitId: string;
   glosario: Map<string, CatalogRule>;
 }) {
+  const t = useTextos();
   return (
     <section className="ucard-bloque libro-bloque libro-opciones">
       <table className="ucard-table libro-tabla">
         <thead>
           <tr>
-            <th className="libro-col-nombre">Opcion</th>
-            <th>Coste</th>
-            <th>Concede</th>
-            <th className="libro-col-reglas">Reglas</th>
+            <th className="libro-col-nombre">{t.opcion}</th>
+            <th>{t.coste}</th>
+            <th>{t.concede}</th>
+            <th className="libro-col-reglas">{t.reglas}</th>
           </tr>
         </thead>
         <tbody>
           {(section.options ?? []).map((option) => (
             <tr key={option.id ?? option.uid ?? option.label}>
-              <td className="libro-col-nombre">{option.label ?? "Opcion"}</td>
-              <td className="num">{optionCost(option, unitId) === 0 ? "gratis" : `+${optionCost(option, unitId)}`}</td>
+              <td className="libro-col-nombre">{option.label ?? t.opcion}</td>
+              <td className="num">{optionCost(option, unitId) === 0 ? t.gratis : `+${optionCost(option, unitId)}`}</td>
               <td>{textoGanancia(option) ?? <span className="ucard-vacio">—</span>}</td>
               <td className="libro-col-reglas">
                 <ReglasTexto etiquetas={reglasDeOpcion(option)} glosario={glosario} />
@@ -356,9 +366,9 @@ function TablaOpcionesLibro({
   );
 }
 
-function tipoConfiguracion(section: UpgradeSection): string {
+function tipoConfiguracion(section: UpgradeSection, t: Textos): string {
   const limite = section.select?.value ? ` ${section.select.value}` : "";
-  return `${section.variant ?? "configuracion"}${limite}`;
+  return `${section.variant ?? t.configuracion}${limite}`;
 }
 
 export function FichaOpcionesLibro({
@@ -372,6 +382,7 @@ export function FichaOpcionesLibro({
   sections: UpgradeSection[];
   glosario: Map<string, CatalogRule>;
 }) {
+  const t = useTextos();
   if (sections.length === 0) return null;
   return (
     <>
@@ -381,11 +392,11 @@ export function FichaOpcionesLibro({
             <h3 className="ucard-title libro-nombre">
               {nombre}
               <span className="libro-opciones-separador">/</span>
-              {section.label ?? "Opciones"}
+              {section.label ?? t.opciones}
             </h3>
             <p className="libro-opciones-meta">
-              <span>Tipo: {tipoConfiguracion(section)}</span>
-              <span>Unidad: {nombre}</span>
+              <span>{t.tipo}: {tipoConfiguracion(section, t)}</span>
+              <span>{t.unidad}: {nombre}</span>
             </p>
           </header>
           <div className="ucard-body libro-cuerpo">
@@ -416,6 +427,7 @@ export function FichaUnidadLibro({
   miniaturaUrl?: string | null;
   puedeLanzarHechizos?: (unit: ResolvedUnit) => boolean;
 }) {
+  const t = useTextos();
   const armas = unit.loadout.filter((entrada) => entrada.kind === "weapon");
   const equipo = unit.loadout.filter((entrada) => entrada.kind === "gear");
   const hechizos = libro && (puedeLanzarHechizos?.(unit) ?? tieneCaster([unit])) ? parseSpells(libro.spells ?? null) : [];
@@ -427,7 +439,7 @@ export function FichaUnidadLibro({
     <article className={`ucard ucard-ejercito libro-ficha${avatarUrl ? " con-avatar" : ""}${miniaturaUrl ? " con-miniatura" : ""}`}>
       <LibroCabecera unit={unit} avatarUrl={avatarUrl} parte={dividida ? (parte === "perfil" ? "1/2" : "2/2") : undefined} />
       {miniaturaUrl ? <img className="libro-miniatura" src={miniaturaUrl} alt="" loading="lazy" /> : null}
-      {dividida ? <p className="libro-aviso">Ficha dividida para no recortar esta unidad al imprimir.</p> : null}
+      {dividida ? <p className="libro-aviso">{t.fichaDividida}</p> : null}
       <div className="ucard-body libro-cuerpo">
         {lore && parte !== "detalles" ? <LoreText text={lore} className="libro-lore" /> : null}
         {parte !== "detalles" ? (
@@ -440,7 +452,7 @@ export function FichaUnidadLibro({
             <TablaHechizosLibro hechizos={hechizos} />
             {unit.notes ? (
               <p className="ucard-notas libro-notas">
-                <span className="ucard-label">Notas</span>
+                <span className="ucard-label">{t.notas}</span>
                 {unit.notes}
               </p>
             ) : null}
@@ -469,16 +481,13 @@ function tarjetasDeUnidadLibro(
   ];
 }
 
-function plural(cantidad: number, singular: string, plural: string): string {
-  return `${cantidad} ${cantidad === 1 ? singular : plural}`;
-}
-
 function ResumenEjercito({ units }: { units: ResolvedUnit[] }) {
+  const t = useTextos();
   const puntos = units.reduce((total, unit) => total + unit.cost, 0);
   const miniaturas = units.reduce((total, unit) => total + unit.size, 0);
   return (
     <p className="print-ejercito-resumen">
-      {[plural(puntos, "punto", "puntos"), plural(units.length, "unidad", "unidades"), plural(miniaturas, "miniatura", "miniaturas")].join(" · ")}
+      {t.resumen(puntos, units.length, miniaturas)}
     </p>
   );
 }
@@ -507,6 +516,7 @@ function VistaLibro({
   puedeLanzarHechizos?: (unit: ResolvedUnit) => boolean;
   noun: ArmyNoun;
 }) {
+  const t = useTextos();
   // Una lista importada y todavia no tocada por el constructor no trae
   // `bookKey` en sus unidades. Con una sola faccion conocida no hay
   // ambiguedad: son todas suyas.
@@ -527,7 +537,7 @@ function VistaLibro({
       .map((bloque) => ({ ...bloque, tarjetas: tarjetasDe(bloque.units) }));
   }, [avatarDe, defaultBookKey, glosario, librosConocidos, puedeLanzarHechizos, units]);
 
-  if (units.length === 0) return <p className="muted">{noun.demonstrativeCap} {noun.singular} no tiene unidades que imprimir.</p>;
+  if (units.length === 0) return <p className="muted">{t.sinUnidades(noun)}</p>;
 
   const variasFacciones = librosConocidos.length > 1;
   return (
@@ -541,7 +551,7 @@ function VistaLibro({
         <section key={bloque.key} className="print-unidad">
           {variasFacciones ? (
             <header className="print-faccion-titulo print-faccion-bloque">
-              <h2>{bloque.libro?.name ?? "Sin faccion"}</h2>
+              <h2>{bloque.libro?.name ?? t.sinFaccion}</h2>
               <ResumenEjercito units={bloque.units} />
             </header>
           ) : null}
@@ -585,6 +595,7 @@ function VistaTarjetas({
   quest: boolean;
   avatarDe?: (unit: ResolvedUnit) => string | null;
 }) {
+  const t = useTextos();
   const tarotMm = quest ? TAROT_PERSONAJE_MM : TAROT_MM;
   // Una carta tipo tarot es mas ancha que alta: una hoja tambien apaisada
   // aprovecha mejor el papel (cuatro por hoja en vez de tres).
@@ -599,7 +610,7 @@ function VistaTarjetas({
     <div className="print-tarjetas">
       {filas.length > 0 ? (
         <section className="print-mazo print-mazo-apaisado">
-          <h3 className="print-mazo-title">Unidades</h3>
+          <h3 className="print-mazo-title">{t.mazoUnidades}</h3>
           {hojasTarot.map((hoja, indice) => (
             <div key={`tarot-${indice}`}>
               <div className="print-hoja" style={estiloTarot}>
@@ -633,7 +644,7 @@ function VistaTarjetas({
       ) : null}
       {cartas.length > 0 ? (
         <section className="print-mazo">
-          <h3 className="print-mazo-title">Habilidades, equipo, hechizos y reglas generales</h3>
+          <h3 className="print-mazo-title">{t.mazoCartas}</h3>
           {hojasScard.map((hoja, indice) => (
             <div key={`scard-${indice}`}>
               <div className="print-hoja" style={estiloScard}>
@@ -687,6 +698,7 @@ export default function ArmyPrintView({
   puedeLanzarHechizos?: (unit: ResolvedUnit) => boolean;
   onCerrar: () => void;
 }) {
+  const t = useTextos();
   const [modo, setModo] = useState<"elegir" | "libro" | "tarjetas">("elegir");
   const filas = useMemo(() => emparejarHeroes(units, entradasAttachedTo), [units, entradasAttachedTo]);
   const cartas = useMemo(() => cartasDe(glosario, units, librosConocidos, puedeLanzarHechizos), [glosario, units, librosConocidos, puedeLanzarHechizos]);
@@ -695,34 +707,27 @@ export default function ArmyPrintView({
     <div className="print-vista">
       <div className="print-toolbar">
         <button type="button" onClick={() => (modo === "elegir" ? onCerrar() : setModo("elegir"))}>
-          {modo === "elegir" ? "Cancelar" : "← Volver a elegir"}
+          {modo === "elegir" ? t.cancelar : t.volverAElegir}
         </button>
-        <h2 className="print-toolbar-title">Imprimir {nombre || noun.singular}</h2>
+        <h2 className="print-toolbar-title">{t.imprimirTitulo(nombre || noun.singular)}</h2>
         {modo !== "elegir" ? (
           <button type="button" className="primary" onClick={() => window.print()}>
-            Imprimir
+            {t.imprimir}
           </button>
         ) : null}
       </div>
 
       {modo === "elegir" ? (
         <div className="print-asistente">
-          <p className="muted">Elige como quieres imprimir las cartas de {noun.demonstrative} {noun.singular}.</p>
+          <p className="muted">{t.eligeModo(noun)}</p>
           <div className="print-opciones">
             <button type="button" className="print-opcion" onClick={() => setModo("libro")}>
-              <strong>Modo libro</strong>
-              <span>
-                Tarjetas grandes de unidad con armas, equipo, hechizos y el texto de sus reglas especiales. La impresion
-                llena cada pagina con las tarjetas que quepan y divide las unidades demasiado largas.
-              </span>
+              <strong>{t.modoLibro}</strong>
+              <span>{t.modoLibroAyuda}</span>
             </button>
             <button type="button" className="print-opcion" onClick={() => setModo("tarjetas")}>
-              <strong>Modo tarjetas con dorso</strong>
-              <span>
-                Cada carta sale una sola vez, pensado para plastificar y recortar: hojas de anverso seguidas de su
-                hoja de reverso. Imprime primero las hojas impares, voltea el papel por el borde largo y vuelve a
-                imprimir las pares.
-              </span>
+              <strong>{t.modoTarjetas}</strong>
+              <span>{t.modoTarjetasAyuda}</span>
             </button>
           </div>
         </div>
